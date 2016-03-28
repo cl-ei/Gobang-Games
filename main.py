@@ -4,6 +4,8 @@
 #编译器： Visual Studio Community 2015 14.0.24720.00 Update 1
 #Python Tools for Visual Studio： 2.2.31124.00
 
+#Author： Caoliang http://www.caoliang.net
+
 import pygame
 from pygame.locals import *
 
