@@ -34,23 +34,24 @@
     <Compile Include="globalvar\__init__.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="sourceflie\sc.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="sourceflie\__init__.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="main.py" />
+    <Compile Include="view\sc.py" />
+    <Compile Include="view\__init__.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="calcul\" />
     <Folder Include="calcul\__pycache__\" />
     <Folder Include="globalvar\" />
-    <Folder Include="sourceflie\" />
+    <Folder Include="view\" />
+    <Folder Include="view\__pycache__\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="calcul\__pycache__\core.cpython-34.pyc" />
     <Content Include="calcul\__pycache__\__init__.cpython-34.pyc" />
+    <Content Include="view\__pycache__\sc.cpython-34.pyc" />
+    <Content Include="view\__pycache__\sc.cpython-35.pyc" />
+    <Content Include="view\__pycache__\__init__.cpython-34.pyc" />
+    <Content Include="view\__pycache__\__init__.cpython-35.pyc" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

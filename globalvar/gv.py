@@ -1,5 +1,12 @@
-﻿#全局变量
+﻿"""
+#此文件包含部分全局变量
 
+#包括：
+#    窗体分辨率数据
+#    各元素相对位置
+#    资源文件路径
+
+"""
 
 #windows size (width,height)
 g_size_win = (800,600)
@@ -59,6 +66,6 @@ g_font  = None
 g_txt_w_thinking = None
 g_txt_b_thinking = None
 
-g_font_for_btn = "ncsj.ttf"
+g_font_for_btn = "sourcefile/ncsj.ttf"
 
 g_num_tab = []

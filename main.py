@@ -4,17 +4,20 @@
 #编译器： Visual Studio Community 2015 14.0.24720.00 Update 1
 #Python Tools for Visual Studio： 2.2.31124.00
 
+#author: caoliang  E-mail : i@caoliang.net
+#http://www.caoliang.net
+
 import pygame
 from pygame.locals import *
 
 from threading import Thread
-from time import sleep
-from sys import exit
-from random import randint
+from time      import sleep
+from sys       import exit
+from random    import randint
 
-from calcul import core
+from calcul    import core
 from globalvar import gv
-from sourceflie import sc
+from view      import sc
 
 def nop():
     pass
@@ -54,12 +57,12 @@ def global_init():
     gv.g_home_img = sc.loadimg(gv.g_home_img_fileloc,gv.g_size_win)
 
     #字体相关的载入
-    gv.g_font = pygame.font.Font("ncsj.ttf",18)
+    gv.g_font = pygame.font.Font("sourcefile/ncsj.ttf",18)
     gv.g_txt_w_thinking = gv.g_font.render("思考中…",True, gv.g_white)
     gv.g_txt_b_thinking = gv.g_font.render("思考中…",True, gv.g_black)
 
     #棋盘步数字体
-    default_font  = "ncsj.ttf"#pygame.font.get_default_font()
+    default_font  = "sourcefile/ncsj.ttf"
 
     max_txt = pygame.font.Font(default_font,24)
     mid_txt = pygame.font.Font(default_font,22)
