@@ -10,7 +10,7 @@
 
 #windows size (width,height)
 g_size_win = (800,600)
-g_icon_fileloc = "./img/head.png"
+g_icon_fileloc = "./sourcefile/gobang.ico"
 g_wintitle  = "CL的五子棋"
 
 g_size_btn = (133,75)

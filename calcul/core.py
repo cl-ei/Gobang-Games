@@ -41,8 +41,6 @@ class Tree():
                 return 1
         return 0
 
-
-
     def delete(self,ele):
         self.ptr_sum = self.ptr_sum - 1
         self.ptr.remove(ele)
@@ -65,16 +63,18 @@ def copy_tree(new_tr,tr):
     for i in tr.ptr:
         new_tr.add(i)
 
-def cut_branch_pl(new_tr,tr):
+def cut_branch_pl(tr):
     li = []
 
     for i in tr.ptr:
         li = li + [i.score]            
-    li.sort()    
+    li.sort()
+
     best_level = li[0]
+
     for i in tr.ptr:
-        if i.score <= best_level:
-            new_tr.add(i)
+        if i.score > best_level:
+            tr.delete(i)
 
 def cut_branch_pc(new_tr,tr):
     li = []
@@ -92,8 +92,25 @@ def cut_branch_pc(new_tr,tr):
     best_level = li[valid_step]
     for i in tr.ptr:
         if i.score >= best_level:
-            new_tr.add(i)    
+            new_tr.add(i)
+   
+def cut_branch(tr):
+    li = []
 
+    for i in tr.ptr:
+        li = li + [i.score] 
+                   
+    li.sort()
+    li.reverse()
+
+    valid_step = len(li) - 1
+    if valid_step > 8:
+        valid_step = 8
+
+    best_level = li[valid_step]
+    for i in tr.ptr:
+        if i.score >= best_level:
+            new_tr.add(i)    
     #计算每一个子树的分值
 def cal_sub(tr):
     if tr.ptr_sum == 0 :
@@ -253,15 +270,6 @@ class Core():
         top_map = Tree()
         self.fill_tree_computer_layer(self.table,top_map,depth = 2)
 
-        '''
-        for i in top_map.ptr:
-            print('\n')
-            print("**** ",i.pos," **** ",i.score ," ****")
-            show_layer(i,2)
-        for i in top_map.ptr:
-            print("\n\n add_score:",i.pos,cal_sub(i))
-        '''
-
         #计算最大的子树，并弹出该坐标
         x,y = cal_max_branch(top_map).pos
 
@@ -272,7 +280,7 @@ class Core():
         self.test_computer()
         self.busy = 0
 
-    #迭代：电脑走下一步
+    #迭代：玩家走下一步
     def fill_tree_player_layer(self,table,top_map,depth):
 
         for j in range(15):
@@ -282,12 +290,13 @@ class Core():
                     if score != 0:
                         node = Tree(0-score,(i,j))
                         top_map.add(node)
-        
-        #自己这边的棋盘，价值大于0的落子点已经填入到树中
 
-        #判断是否要下一次迭代
+        
         dep = depth - 1
+
+        #深度大于0，需要迭代下一次
         if dep > 0:
+
             #接下来把对对方有利的落子点，也添加到这里        
             for j in range(15):
                 for i in range(15):
@@ -299,12 +308,17 @@ class Core():
             
             #下一次迭代
             for i in top_map.ptr:
-                tab = deepcopy(table)
-                x,y = i.pos
-                tab[x][y] = 1
-                self.fill_tree_computer_layer(tab,i,dep)
+                if i.score > -8000000:
+                    tab = deepcopy(table)
+                    x,y = i.pos
+                    tab[x][y] = 1
+                    self.fill_tree_computer_layer(tab,i,dep)
 
-    #迭代：假设玩家走下一步
+        #深度到底，不进行下一次，剪掉不值得的走棋点
+        else:
+            cut_branch_pl(top_map)
+
+    #迭代：假设电脑走下一步
     def fill_tree_computer_layer(self,table,top_map,depth):
         
         for j in range(15):
@@ -315,7 +329,6 @@ class Core():
                         node = Tree(score,(i,j))
                         top_map.add(node)
         
-        #自己这边的棋盘，价值大于0的落子点已经填入到树中
         #剪枝完毕，确认是否要进行下一次迭代
         dep = depth - 1
         if dep > 0:
@@ -329,10 +342,11 @@ class Core():
                             top_map.add(node)       
         
             for i in top_map.ptr:
-                tab = deepcopy(table)
-                x,y = i.pos
-                tab[x][y] = 2
-                self.fill_tree_player_layer(tab,i,dep)
+                if i.score < 8000000:
+                    tab = deepcopy(table)
+                    x,y = i.pos
+                    tab[x][y] = 2
+                    self.fill_tree_player_layer(tab,i,dep)
     
     #判断落子点周围四个方向上，连成最长一串的棋子的个数       
     def cal_sum_arround(self,table=[],pos = (0,0),key = 1):
@@ -513,16 +527,25 @@ class Core():
     #回退一步，悔棋函数
     def go_back(self):
         if self.index>=2:
-            if self.who_win != 0:
+            if self.who_win == 1:
                 self.who_win = 0
-            #将棋盘最后2步归0
-            for i in range(2):                       
+                #将棋盘最后1步归0                       
                 x,y=self.step[self.index]
                 self.table[x][y] = 0
 
                 print("tuihui:",x,y)
                 self.index -= 1
-            return 1
+                return 1
+            else:
+                self.who_win = 0
+                #将棋盘最后2步归0
+                for i in range(2):                       
+                    x,y=self.step[self.index]
+                    self.table[x][y] = 0
+
+                    print("tuihui:",x,y)
+                    self.index -= 1
+                return 1
         else:
             return 0
     

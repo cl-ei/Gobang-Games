@@ -153,7 +153,7 @@ def surface_game():
         if back_btn.update(nop) == 1:
             break
         pygame.display.update()
-        gv.g_clock.tick(30)
+        gv.g_clock.tick(15)
 
 if __name__ == "__main__":
     main()

@@ -6,4 +6,4 @@ setup(
 name = "hello",
 version = "0.1",
 description = "the typical 'Hello, world!'",
-executables = [Executable("main.py",base = base,icon="./gobang.ico")])
+executables = [Executable("main.py",base = base,icon="./sourcefile/gobang.ico")])
