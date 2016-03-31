@@ -7,14 +7,14 @@
 + 编译器： Visual Studio Community 2015 14.0.24720.00 Update 1
 + Python Tools for Visual Studio： 2.2.31124.00
 
-#Author： Caoliang http://www.caoliang.net
+###Author： Caoliang http://www.caoliang.net
 
 
 点击 [http://caoliang.net/downloads/gobang.7z](http://caoliang.net/downloads/gobang.7z) 下载游戏试玩，系统要求：windows7以上，64位。
 
 ## License
 
-Copyright (c) 2015 wy-ei. (MIT License
+Copyright (c) 2016 cl-ei. (MIT License)
 
 
 
