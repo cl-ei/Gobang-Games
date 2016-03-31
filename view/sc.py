@@ -1,4 +1,7 @@
-﻿
+﻿"""
+#此文件包含部分按钮、进度条等组件的绘制和事件处理
+
+"""
 import pygame
 from globalvar import gv
 
@@ -28,12 +31,14 @@ class Button():
         mouse_pos = pygame.mouse.get_pos()
         event_happen = 0
 
+        #如果指针未在按钮区域内，按钮状态置0
         if self.ptr_not_in_border(mouse_pos) == True:
             self.screen.blit(self.static_img,self.position)
-            self.button_state = 0
+            self.button_pushed = 0
 
         else:
-
+            #指针在区域内，且已按下
+            #绘制按下图像，状态置1
             if pygame.mouse.get_pressed()[0] == 1:
                 self.screen.blit(self.down_img,self.position)
                 self.button_pushed = True       
@@ -126,7 +131,6 @@ class ProgressBar():
                 self.level_position = self.border[0]
                 self.direction = 1
             self.screen.blit(self.img,(self.level_position,self.vertical_position))
-
 
 def pixpos_to_table(pos = (0,0)):
     i=(pos[0] - gv.g_pos_grid_start[0] + 5)//gv.g_width_grid

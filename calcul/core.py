@@ -1,11 +1,24 @@
-﻿"wuziqi core"
+﻿"""
+#_____wuziqi core____
+#
+#这一部分包含所有五子棋内核的计算
+#
+#包含
+#    五子棋树的结构和相关操作方法
+#    走棋顺序控制
+#    价值判断方法等
+
+"""
+
+__author__ = "caoliang"
+
 import time
 from random import randint
 from threading import Thread
 from time import sleep
 from copy import deepcopy
 
-__author__ = "caoliang"
+
 class Tree():
     def __init__(self, score = 0, pos = (-1,-1), ly = 0):
         self.score = score
@@ -166,7 +179,7 @@ class Core():
                           250,
                           200]  
         
-
+    #玩家走一步棋
     def player_take(self,pos = (0,0)):
 
         if self.table[pos[0]][pos[1]] == 0:
@@ -191,6 +204,7 @@ class Core():
             return 1
         return 0
 
+    #电脑走第一步
     def computer_take_first(self,tmp):
         sleep(0.6)
         if self.index == 0:
@@ -233,6 +247,7 @@ class Core():
         
         self.busy = 0
     
+    #电脑走第二步以后
     def computer_take(self,tmp):
 
         top_map = Tree()
@@ -257,6 +272,7 @@ class Core():
         self.test_computer()
         self.busy = 0
 
+    #迭代：电脑走下一步
     def fill_tree_player_layer(self,table,top_map,depth):
 
         for j in range(15):
@@ -288,7 +304,7 @@ class Core():
                 tab[x][y] = 1
                 self.fill_tree_computer_layer(tab,i,dep)
 
-    #填写树
+    #迭代：假设玩家走下一步
     def fill_tree_computer_layer(self,table,top_map,depth):
         
         for j in range(15):
@@ -317,7 +333,8 @@ class Core():
                 x,y = i.pos
                 tab[x][y] = 2
                 self.fill_tree_player_layer(tab,i,dep)
-            
+    
+    #判断落子点周围四个方向上，连成最长一串的棋子的个数       
     def cal_sum_arround(self,table=[],pos = (0,0),key = 1):
 
         x,y = pos
@@ -377,6 +394,7 @@ class Core():
             dir[i] = five_p[i] + five_p[i+4]
         return dir
 
+    #检测玩家是否胜利
     def test_player(self):
         self.last_pcs_dirction = self.cal_sum_arround(self.table,self.step[self.index])
         for i in range(4):
@@ -391,6 +409,7 @@ class Core():
                 self.who_win = 2 
                 break
 
+    #获取落子点周围四个方向上的棋型
     def get_chess_type(self,table=[],pos = (0,0),key = 1):
         x,y = pos
         chess_type = ['' for i in range(8)]
@@ -490,17 +509,8 @@ class Core():
                 if pcs_type[i].find(self.table_type[j]) > -1:
                     score = score + self.table_score[j]
         return score
-
-    def cal_single_pcs_value_debug(self,table=[],pos = (0,0),key = 1):
-        pcs_type = self.get_chess_type(table,pos,key)
-        score = 0
-        for i in range(4):
-            for j in range(14):
-                if pcs_type[i].find(self.table_type[j]) > -1 or \
-                    pcs_type[i].find(self.table_type[j][::-1]) > -1:
-                    score = score + self.table_score[j]
-        return score
-
+    
+    #回退一步，悔棋函数
     def go_back(self):
         if self.index>=2:
             if self.who_win != 0:
@@ -515,14 +525,12 @@ class Core():
             return 1
         else:
             return 0
-
+    
+    #提示函数
     def go_ahead(self):
         top_map = Tree()
         self.fill_tree_player_layer(self.table,top_map,1)
         self.player_take(cal_max_branch(top_map).pos)
-
-
-
 
 
 def test():
