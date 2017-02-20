@@ -1,13 +1,17 @@
-﻿"""
+﻿# -*- coding: utf-8 -*-
+
+"""
 #此文件包含部分按钮、进度条等组件的绘制和事件处理
 
 """
 import pygame
 from globalvar import gv
 
-def loadimg(file_loc,size = (0,0)):
+
+def loadimg(file_loc, size=(0, 0)):
     img = pygame.image.load(file_loc).convert_alpha()
     return pygame.transform.smoothscale(img,size)
+
 
 class Button():
     def __init__(self, btn_file_loc = (None,None,None),size=(0,0),position=(0,0)):
@@ -175,9 +179,10 @@ def draw_five(core):
         y = circle_pos[1] + 12
         pygame.draw.circle(gv.g_screen,(200,0,0),(x,y),4)
 
-class GetInput():
+
+class GetInput(object):
     def __init__(self):
-        #error 鼠标可以偏移竖线的距离
+        # error 鼠标可以偏移竖线的距离
         self.border_x = (gv.g_pos_grid_start[0],gv.g_size_grid + gv.g_pos_grid_start[0])
         self.border_y = (gv.g_pos_grid_start[1],gv.g_size_grid + gv.g_pos_grid_start[1])
 
@@ -185,31 +190,31 @@ class GetInput():
         self.mouse_kdown = 0
 
     def scan(self):
-        return_data = (-1,0,0)
+        return_data = (-1, 0, 0)
         mouse_status = pygame.mouse.get_pressed()[0]
 
-        #当鼠标按下的时候
+        # 当鼠标按下的时候
         if mouse_status == 1:
             self.mouse_kdown = 1
             self.last_position = pygame.mouse.get_pos()
 
-        #鼠标未按下
-        else :
-            #从按下的瞬间抬起
+        # 鼠标未按下
+        else:
+            # 从按下的瞬间抬起
             if self.mouse_kdown == 1:
                 self.mouse_kdown = 0
                 pos = pygame.mouse.get_pos()
-                if self.ptr_in_border(pos) ==  1:
-                    return_data = (1,pos[0],pos[1])
+                if self.ptr_in_border(pos) == 1:
+                    return_data = (1, pos[0], pos[1])
                 else:
-                    #移出边界，无效
+                    # 移出边界，无效
                     pass
 
         return return_data
 
-    def ptr_in_border(self,pos):
+    def ptr_in_border(self, pos):
         if (self.border_x[0] - 4) <= pos[0] <= (self.border_x[1] + 4) and \
-                (self.border_y[0] - 4) <= pos[1] <= (self.border_y[1] + 4 ):
+                (self.border_y[0] - 4) <= pos[1] <= (self.border_y[1] + 4):
             return 1
         else:
             return 0

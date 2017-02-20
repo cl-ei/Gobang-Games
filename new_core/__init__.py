@@ -2,6 +2,7 @@
 
 """
 This file contain the new gobang core calculate method and data structure.
+
 """
 POINT_TABLE = {
     'aaaaa': 8000000,
@@ -29,9 +30,33 @@ POINT_TABLE = {
 
 class Core(object):
     def __init__(self, black, white, current_pos):
+        """
+
+        :param black: chess pieces map of black
+        :param white: chess pieces map of white
+        :param current_pos: the current chess pieces position.
+        """
         super(Core, self).__init__()
         self.black = black
         self.white = white
         self.current_pos = current_pos
+        self._next = "w" if bool(black[current_pos & 0xf] & (current_pos << (current_pos >> 4))) else "b"
 
-        self._next = 0 if bool(black[current_pos & 0xf] & (current_pos << (current_pos >> 4))) else 1
+    def find_winner(self):
+        pass
+
+    def get_empty_pos(self):
+        pass
+
+    def extract_table_type(self):
+        pass
+
+    def get_result(self):
+        pass
+
+
+class Game(object):
+    def __init__(self, status):
+        super(Game, self).__init__()
+        self.status = status
+

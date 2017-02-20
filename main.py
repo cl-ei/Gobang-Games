@@ -136,25 +136,27 @@ def surface_game():
             # 电脑落子
             if wzqcore.busy == 1:
                 # 显示 思考
-                gv.g_screen.blit(gv.g_txt_w_thinking,(670 ,27))
+                gv.g_screen.blit(gv.g_txt_w_thinking, (670, 27))
                 computer_pgsbar.draw()
 
             # 玩家落子
             else:
                 input_status = input_info.scan()
                 if input_status[0] == 1:
-                    tab_pos = sc.pixpos_to_table((input_status[1], input_status[2]))
-                    wzqcore.player_take(tab_pos)                    
+                    tab_pos = sc.pixpos_to_table(input_status[1:])
+                    wzqcore.player_take(tab_pos)
+
                 # 绘制进度条
                 gv.g_screen.blit(think_img, (680, 420))
                 player_pgsbar.draw()
 
         if wzqcore.busy == 0 and wzqcore.index > 1:
-            goback_btn.update(wzqcore.go_back)            
+            goback_btn.update(wzqcore.go_back)
             goahead_btn.update(wzqcore.go_ahead)
         
         if back_btn.update(nop) == 1:
             break
+
         pygame.display.update()
         gv.g_clock.tick(15)
 
