@@ -3,7 +3,7 @@
 """
 python version: v3.5.1:37a07cee5969
 pygame version:1.9.2a0
-env：windows  10.0.10586 x64
+env: windows  10.0.10586 x64
 
 author: caoliang  E-mail : i#caoliang.net
 http://www.caoliang.net
