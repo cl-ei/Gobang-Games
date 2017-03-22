@@ -67,9 +67,9 @@ def global_init():
     # 棋盘步数字体
     default_font = "sourcefile/ncsj.ttf"
 
-    max_txt = pygame.font.Font(default_font,24)
-    mid_txt = pygame.font.Font(default_font,22)
-    min_txt = pygame.font.Font(default_font,20)
+    max_txt = pygame.font.Font(default_font, 24)
+    mid_txt = pygame.font.Font(default_font, 22)
+    min_txt = pygame.font.Font(default_font, 20)
     for i in range(10):
         gv.g_num_tab += [max_txt.render(str(i), True, (180, 180, 180))]
     for i in range(10, 100):
@@ -115,10 +115,8 @@ def surface_game():
         for event in pygame.event.get():
             if event.type == QUIT:
                 exit()
-        # 绘制背景
-        gv.g_screen.blit(grid_img, (0, 0))
 
-        # 绘制棋子
+        gv.g_screen.blit(grid_img, (0, 0))
         sc.draw_table(wzqcore, w_img, b_img)
         
         # 不为0时，已分胜负

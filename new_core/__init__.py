@@ -4,6 +4,16 @@
 This file contain the new gobang core calculate method and data structure.
 
 """
+
+from enum import Enum, unique
+
+
+@unique
+class Winner(Enum):
+    computer = 1  # Sun的value被设定为0
+    person = 2
+
+
 POINT_TABLE = {
     'aaaaa': 8000000,
     '?aaaa?': 300000,
