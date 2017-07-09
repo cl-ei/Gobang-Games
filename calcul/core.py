@@ -129,6 +129,7 @@ def cal_max_branch(tr):
 
         return best_ptr
 
+
 class Core(object):
     def __init__(self):
 

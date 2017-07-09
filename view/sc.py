@@ -20,23 +20,22 @@ class Button(object):
         self.screen = gv.g_screen
         self.position = position
         self.button_pushed = 0
-        self.border_x = (position[0],position[0]+size[0])
-        self.border_y = (position[1],position[1]+size[1])
+        self.border_x = (position[0], position[0]+size[0])
+        self.border_y = (position[1], position[1]+size[1])
 
-        self.static_img = loadimg(btn_file_loc[0],size)
-        self.focus_img = loadimg(btn_file_loc[1],size)
-        self.down_img = loadimg(btn_file_loc[2],size)
+        self.static_img = loadimg(btn_file_loc[0], size)
+        self.focus_img = loadimg(btn_file_loc[1], size)
+        self.down_img = loadimg(btn_file_loc[2], size)
 
-    def ptr_not_in_border(self,pos):
-        if self.border_x[0] <= pos[0] <= self.border_x[1] and \
-                self.border_y[0] <= pos[1] <= self.border_y[1]:
-            return False
-        else:
-            return True
+    def ptr_not_in_border(self, pos):
+        return not (
+            (self.border_x[0] <= pos[0] <= self.border_x[1]) and
+            (self.border_y[0] <= pos[1] <= self.border_y[1])
+        )
 
-    def update(self, func=None):
+    def update(self, callback=None, callback_args=None, callback_kwargs=None):
         mouse_pos = pygame.mouse.get_pos()
-        event_happen = 0
+        event_happen = False
 
         # 如果指针未在按钮区域内，按钮状态置0
         if self.ptr_not_in_border(mouse_pos):
@@ -55,9 +54,11 @@ class Button(object):
                     self.screen.blit(self.focus_img, self.position)
                 else:
                     self.button_pushed = False
-                    event_happen = 1
-                    if "__call__" in dir(func):
-                        func.__call__()
+                    event_happen = True
+                    if callable(callback):
+                        callback_args = callback_args or ()
+                        callback_kwargs = callback_kwargs or {}
+                        callback(*callback_args, **callback_kwargs)
         return event_happen
 
 
@@ -94,38 +95,38 @@ def pixpos_to_table(pos):
 
 
 def teble_to_pixpos(pos):
-    return [
+    return (
         pos[0]*gv.g_width_grid + gv.g_pos_grid_start[0] - 2,
         pos[1]*gv.g_width_grid + gv.g_pos_grid_start[1] - 2,
-    ]
+    )
 
 
-def draw_table(core, w_img, b_img):
-    if core.index == 0:
-        return
+def draw_table(table, w_img, b_img):
+    for __ in range(len(table)):
+        table_pos = table[__]
+        pix_pos = teble_to_pixpos(table_pos)
+        blit_image = w_img if __ % 2 == 0 else b_img
+        gv.g_screen.blit(blit_image, pix_pos)
 
-    # 从索引位1开始，绘制棋子
-    for i in range(1, core.index+1):
-        if i % 2 == 0:
-            gv.g_screen.blit(w_img, teble_to_pixpos(core.step[i]))
+        if __ == len(table) - 1:
+            continue
 
+        # draw index number
+        if __ < 10:
+            index_pos = pix_pos[0] + 8, pix_pos[1]
+        elif __ < 100:
+            index_pos = pix_pos[0] + 4, pix_pos[1] + 1
         else:
-            gv.g_screen.blit(b_img, teble_to_pixpos(core.step[i]))
+            index_pos = pix_pos[0] + 1, pix_pos[1] + 2
+        num_surface = gv.g_num_tab[__ + 1]
+        gv.g_screen.blit(num_surface, index_pos)
 
-    # 从索引位1开始，绘制步号
-    for i in range(1, core.index):
-        x, y = teble_to_pixpos(core.step[i])
-        if i < 10:            
-            gv.g_screen.blit(gv.g_num_tab[i], (x+8, y))
-        elif i < 100:
-            gv.g_screen.blit(gv.g_num_tab[i], (x+4, y+1))
-        else:
-            gv.g_screen.blit(gv.g_num_tab[i], (x+1, y+2))
-
-    circle_pos = teble_to_pixpos(core.step[core.index])
-    x = circle_pos[0] + 12
-    y = circle_pos[1] + 12
-    pygame.draw.circle(gv.g_screen, (200, 0, 0), (x, y), 4)
+    # draw last position
+    if table:
+        last_step_pos = teble_to_pixpos(table[-1])
+        last_step_pix_pos = last_step_pos[0] + 12, last_step_pos[1] + 12
+        pygame.draw.circle(gv.g_screen, (200, 0, 0), last_step_pix_pos, 4)
+    return
 
 
 def draw_five(core):
@@ -146,7 +147,7 @@ class GetInput(object):
         self.mouse_kdown = 0
 
     def scan(self):
-        return_data = (-1, 0, 0)
+        return_data = False, (0, 0)
         mouse_status = pygame.mouse.get_pressed()[0]
 
         # 当鼠标按下的时候
@@ -160,8 +161,8 @@ class GetInput(object):
             if self.mouse_kdown == 1:
                 self.mouse_kdown = 0
                 pos = pygame.mouse.get_pos()
-                if self.ptr_in_border(pos) == 1:
-                    return_data = (1, pos[0], pos[1])
+                if self.ptr_in_border(pos):
+                    return_data = True, pos
                 else:
                     # 移出边界，无效
                     pass
@@ -169,8 +170,7 @@ class GetInput(object):
         return return_data
 
     def ptr_in_border(self, pos):
-        if (self.border_x[0] - 4) <= pos[0] <= (self.border_x[1] + 4) and \
-                (self.border_y[0] - 4) <= pos[1] <= (self.border_y[1] + 4):
-            return 1
-        else:
-            return 0
+        return (
+            (self.border_x[0] - 4) <= pos[0] <= (self.border_x[1] + 4) and
+            (self.border_y[0] - 4) <= pos[1] <= (self.border_y[1] + 4)
+        )

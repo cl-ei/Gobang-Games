@@ -11,17 +11,10 @@ http://www.caoliang.net
 
 import pygame
 from pygame.locals import *
-from threading import Thread
-from time import sleep
 from sys import exit
-from random import randint
-from calcul import core
 from globalvar import gv
 from view import sc
-
-
-def nop():
-    pass
+from newcore import GameManager, Role
 
 
 def main():
@@ -37,7 +30,7 @@ def main():
             if event.type == QUIT:
                 exit()
 
-        gv.g_screen.blit(gv.g_home_img,(0,0))
+        gv.g_screen.blit(gv.g_home_img, (0, 0))
 
         btn_start.update(surface_game)
         btn_about.update(surface_about)
@@ -82,13 +75,13 @@ def surface_about():
         
     btn_back = sc.Button(gv.g_btn_back_imgloc, gv.g_size_btn, gv.g_pos_btn_back)
     about_bkgimg = sc.loadimg(gv.g_surfaceback_img_fileloc, gv.g_size_win)
-    
+
     while True:
         for event in pygame.event.get():
             if event.type == QUIT:
                 exit()
         gv.g_screen.blit(about_bkgimg, (-1, -1))
-        if btn_back.update(nop) == 1:
+        if btn_back.update() == 1:
             break
         pygame.display.update()
         gv.g_clock.tick(30)
@@ -108,7 +101,7 @@ def surface_game():
     computer_pgsbar = sc.ProgressBar("img/round_white.png", (12, 12), (675, 50), 40)
     player_pgsbar = sc.ProgressBar("img/round_black.png", (12, 12), (720, 440), 40)
     
-    wzqcore = core.Core()
+    gobang_mgr = GameManager()
     input_info = sc.GetInput()
 
     while True:
@@ -117,14 +110,14 @@ def surface_game():
                 exit()
 
         gv.g_screen.blit(grid_img, (0, 0))
-        sc.draw_table(wzqcore, w_img, b_img)
+        sc.draw_table(table=gobang_mgr.table, w_img=w_img, b_img=b_img)
         
         # 不为0时，已分胜负
-        if wzqcore.who_win != 0:
+        if gobang_mgr.winner is not None:
             one_more_img = sc.loadimg("img/one_more_time.png", (100, 80))
             win_img = sc.loadimg(
-                "img/win.png" if wzqcore.who_win == 1 else "img/win_2.png",
-                (130, 45)
+                file_loc="img/win.png" if gobang_mgr.winner == Role.player else "img/win_2.png",
+                size=(130, 45)
             )
             gv.g_screen.blit(win_img, (300, 495))
             gv.g_screen.blit(one_more_img, (20, 420))
@@ -132,31 +125,36 @@ def surface_game():
         # 未分胜负
         else:
             # 电脑落子
-            if wzqcore.busy == 1:
+            if gobang_mgr.busy:
                 # 显示 思考
                 gv.g_screen.blit(gv.g_txt_w_thinking, (670, 27))
                 computer_pgsbar.draw()
 
             # 玩家落子
             else:
-                input_status = input_info.scan()
-                if input_status[0] == 1:
-                    tab_pos = sc.pixpos_to_table(input_status[1:])
-                    wzqcore.player_take(tab_pos)
+                pressed, pos = input_info.scan()
+                if pressed:
+                    tab_pos = sc.pixpos_to_table(pos)
+                    print("tab_pos: ", tab_pos)
+                    gobang_mgr.player_take(tab_pos)
 
                 # 绘制进度条
                 gv.g_screen.blit(think_img, (680, 420))
                 player_pgsbar.draw()
 
-        if wzqcore.busy == 0 and wzqcore.index > 1:
-            goback_btn.update(wzqcore.go_back)
-            goahead_btn.update(wzqcore.go_ahead)
-        
-        if back_btn.update(nop) == 1:
+        if not gobang_mgr.busy and gobang_mgr.step:
+            goback_btn.update(gobang_mgr.go_back)
+            goahead_btn.update(gobang_mgr.go_ahead)
+
+        event_happend = back_btn.update()
+        if event_happend:
             break
 
         pygame.display.update()
-        gv.g_clock.tick(15)
+        gv.g_clock.tick(30)
 
 if __name__ == "__main__":
-    main()
+    from newcore import test
+
+    test()
+    # main()
