@@ -15,6 +15,12 @@ class Role(Enum):
     player = "player"
 
 
+@unique
+class RoleColor(Enum):
+    black = "black"
+    white = "white"
+
+
 POINT_TABLE = {
     'aaaaa': 8000000,
     '?aaaa?': 300000,
@@ -60,33 +66,97 @@ POINT_TABLE_BIN = {
     0b110101000000: 150,            # 'aa???'
     0b110000000101: 150,            # '???aa'
 }
+TABLE_SIZE = 15
 
 
 class Core(object):
-    def __init__(self, black, white, current_pos):
+    def __init__(self, table, last_pos):
         """
 
-        :param black: chess pieces map of black
-        :param white: chess pieces map of white
-        :param current_pos: the current chess pieces position.
+        :param table: chess pieces map
+        :param last_pos: the last chess pieces position.
         """
-        super(Core, self).__init__()
-        self.black = black
-        self.white = white
-        self.current_pos = current_pos
-        self._next = "w" if bool(black[current_pos & 0xf] & (current_pos << (current_pos >> 4))) else "b"
+        self.table = table
+        self.last_pos = last_pos
+        x, y = last_pos & 0b1111, last_pos >> 4
+        last_role = (table[y] >> (x << 1)) & 3
+        self.last_role = last_role
+        if last_role == 1:
+            self._next = RoleColor.white
+        elif last_role == 2:
+            self._next = RoleColor.black
+        else:
+            raise ValueError("Bad table")
 
     def find_winner(self):
         pass
 
     def get_empty_pos(self):
-        pass
+        empty_pos = []
+        for y in range(len(self.table)):
+            line = self.table[y]
+            for x in range(TABLE_SIZE):
+                if line >> (x << 1) & 3 == 0:
+                    empty_pos.append((x, y))
+        return empty_pos
 
-    def extract_table_type(self):
-        pass
+    def analysiz_a_dot(self, x, y):
+        if (x, y) == (8, 7):
+            self.analysis_a_line(1, 1, 1)
+        return None
+
+    def analysis_a_line(self, line, x_position, dot_value_for_self, line_size=TABLE_SIZE):
+        this_line = 0b0000000000100001000000100010000
+        #             5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
+        dot_value_for_self = 2
+        x_position = 7
+
+        r_map = 0b1101
+        bit_length = 1
+        for x_offset in range(x_position + 1, line_size):
+            dot = this_line >> (x_offset << 1) & 3
+            if dot == 0:
+                r_map <<= 2
+                bit_length += 1
+            elif dot == dot_value_for_self:
+                r_map = (r_map << 2) | 1
+                bit_length += 1
+            else:
+                break
+        print("-> ", bin(r_map))
+        for _ in range(1, x_position + 1):
+            x_offset = x_position - _
+            if x_offset < 0:
+                break
+            dot = this_line >> (x_offset << 1) & 3
+            if dot == 0:
+                r_map |= 3 << ((bit_length + 1) << 1)
+                r_map &= ~(3 << (bit_length << 1))
+                bit_length += 1
+            elif dot == dot_value_for_self:
+                r_map |= 3 << ((bit_length + 1) << 1)
+                r_map &= ~(2 << (bit_length << 1))
+                bit_length += 1
+            else:
+                break
+        print("r_map: ", bin(r_map))
+        return r_map
+
+    def distribute_calcul_task(self, empty_pos):
+        for pos in empty_pos:
+            self.analysiz_a_dot(*pos)
 
     def get_result(self):
-        pass
+        empty_pos = self.get_empty_pos()
+
+        empty_pos_check = []
+        for x in range(TABLE_SIZE):
+            for y in range(TABLE_SIZE):
+                if (x, y) not in empty_pos:
+                    empty_pos_check.append((x, y))
+
+        self.distribute_calcul_task(empty_pos=empty_pos)
+        return ""
 
 
 class GameManager(object):
@@ -115,11 +185,12 @@ class GameManager(object):
         self.__step += 1
         return True
 
-    def pc_take(self):
-        while True:
-            pos = (randint(0, 13), randint(0, 13))
-            if pos not in self.table:
-                break
+    def pc_take(self, pos):
+        if not pos:
+            while True:
+                pos = (randint(0, 13), randint(0, 13))
+                if pos not in self.table:
+                    break
 
         self.__step += 1
         self.__table.append(pos)
@@ -143,28 +214,18 @@ class GameManager(object):
             table[y] |= 1 << bit_pos
         return table
 
-    def unzip_table(self, bin_table):
-        table = []
-        for y in range(len(bin_table)):
-            line = bin_table[y]
-            if line:
-                for x in range(16):
-                    if bin_table[y] & (3 << (x << 1)):
-                        table.append((x, y))
-        return table
+    def calcul(self):
+        table = self.zip_table()
+        x, y = self.table[-1]
+        core = Core(table=table, last_pos=(y << 4) + (x & 0b1111))
+        result = core.get_result()
 
 
 def test():
     mgr = GameManager()
-
-    for i in range(20):
-        while True:
-            player_s_take = (randint(0, 15), randint(0, 15))
-            if player_s_take not in mgr.table:
-                break
-        mgr.player_take(player_s_take)
-        mgr.pc_take()
-        table = mgr.table
-        print("table:     ", table, )
-        print("zip table: ", mgr.unzip_table(mgr.zip_table()))
+    mgr.player_take((7, 8))
+    mgr.pc_take((7, 7))
+    mgr.player_take((11, 7))
+    mgr.calcul()
+    # mgr.pc_take()
     print("susscess")
