@@ -1,7 +1,7 @@
 import sys
 import random
 import pygame
-from pygame.locals import QUIT, KEYUP
+from pygame.locals import QUIT, KEYUP, K_UP, K_DOWN, K_LEFT, K_RIGHT
 
 direction_choice = ("L", "R", "U", "D")
 
@@ -134,10 +134,10 @@ class Snake(object):
             "R": "L",
         }
         switch_key_map = {
-            pygame.K_UP: "U",
-            pygame.K_DOWN: "D",
-            pygame.K_LEFT: "L",
-            pygame.K_RIGHT: "R",
+            K_UP: "U",
+            K_DOWN: "D",
+            K_LEFT: "L",
+            K_RIGHT: "R",
         }
         event_key_dir = switch_key_map.get(event.key)
         if event_key_dir and forbidden_key_map.get(event_key_dir) != self.direction:
@@ -147,7 +147,7 @@ class Snake(object):
     def update(self, screen):
         self.time_tick += 1
         self.screen.fill((30, 30, 30))
-        for i in range(0, self.length):
+        for i in range(self.length):
             pygame.draw.rect(screen, self.color, (self.positon[i][0]*50+5, self.positon[i][1]*50+5, 40, 40), 0)
             pygame.draw.circle(screen, (100, 0, 0), (self.positon[0][0]*50+25, self.positon[0][1]*50+25), 10, 0)
         pygame.draw.rect(screen, (200, 0, 0), (self.position_obs[0]*50, self.position_obs[1]*50, 50, 50), 0)
