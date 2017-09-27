@@ -17,7 +17,7 @@ from view import sc
 from newcore import GameManager, Role
 
 
-def main():
+def _main():
     
     global_init()    
 
@@ -37,38 +37,6 @@ def main():
 
         pygame.display.update()
         gv.g_clock.tick(30)
-
-
-def global_init():
-
-    pygame.init()
-
-    # load icon & title
-    pygame.display.set_icon(pygame.image.load(gv.g_icon_fileloc))
-    pygame.display.set_caption(gv.g_wintitle)
-
-    gv.g_screen = pygame.display.set_mode(gv.g_size_win)
-    gv.g_clock = pygame.time.Clock()
-
-    gv.g_home_img = sc.loadimg(gv.g_home_img_fileloc, gv.g_size_win)
-
-    # 字体相关的载入
-    gv.g_font = pygame.font.Font("sourcefile/ncsj.ttf", 18)
-    gv.g_txt_w_thinking = gv.g_font.render("思考中…", True, gv.g_white)
-    gv.g_txt_b_thinking = gv.g_font.render("思考中…", True, gv.g_black)
-
-    # 棋盘步数字体
-    default_font = "sourcefile/ncsj.ttf"
-
-    max_txt = pygame.font.Font(default_font, 24)
-    mid_txt = pygame.font.Font(default_font, 22)
-    min_txt = pygame.font.Font(default_font, 20)
-    for i in range(10):
-        gv.g_num_tab += [max_txt.render(str(i), True, (180, 180, 180))]
-    for i in range(10, 100):
-        gv.g_num_tab += [mid_txt.render(str(i), True, (180, 180, 180))]
-    for i in range(100, 256):
-        gv.g_num_tab += [min_txt.render(str(i), True, (180, 180, 180))]
 
 
 def surface_about():
@@ -153,8 +121,56 @@ def surface_game():
         pygame.display.update()
         gv.g_clock.tick(30)
 
-if __name__ == "__main__":
-    from newcore import test
 
-    test()
-    # main()
+class Game(object):
+    def __init__(self, window_size, caption, icon=None):
+        pygame.init()
+
+        if caption is not None:
+            pygame.display.set_caption(caption)
+        if icon is not None:
+            pygame.display.set_icon(pygame.image.load(icon))
+
+        self.window_size = window_size
+        self.screen = pygame.display.set_mode(window_size)
+        self.clock = pygame.time.Clock()
+
+        gv.g_home_img = sc.loadimg(gv.g_home_img_fileloc, self.window_size)
+
+        # 字体相关的载入
+        gv.g_font = pygame.font.Font("sourcefile/ncsj.ttf", 18)
+        gv.g_txt_w_thinking = gv.g_font.render("思考中…", True, gv.g_white)
+        gv.g_txt_b_thinking = gv.g_font.render("思考中…", True, gv.g_black)
+
+        # 棋盘步数字体
+        default_font = "sourcefile/ncsj.ttf"
+
+        max_txt = pygame.font.Font(default_font, 24)
+        mid_txt = pygame.font.Font(default_font, 22)
+        min_txt = pygame.font.Font(default_font, 20)
+        for i in range(10):
+            gv.g_num_tab += [max_txt.render(str(i), True, (180, 180, 180))]
+        for i in range(10, 100):
+            gv.g_num_tab += [mid_txt.render(str(i), True, (180, 180, 180))]
+        for i in range(100, 256):
+            gv.g_num_tab += [min_txt.render(str(i), True, (180, 180, 180))]
+
+    def wait_start(self):
+        pass
+
+    def gaming(self):
+        pass
+
+    def about(self):
+        pass
+
+
+def main():
+    game = Game()
+    while True:
+        game.wait_start()
+        game.gaming()
+
+
+if __name__ == "__main__":
+    main()
