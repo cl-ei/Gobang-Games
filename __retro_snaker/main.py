@@ -18,16 +18,23 @@ class Player(pygame.sprite.Sprite):
 
 
 class Snake(object):
-    def __init__(self, windows_size, screen, clock):
+    def __init__(self, windows_size, caption=None, icon=None, fps=20):
         self.windows_size = windows_size
-        self.screen = screen
-        self.direction = random.choice(direction_choice)
-        self.clock = clock
 
+        pygame.init()
+        self.screen = pygame.display.set_mode(windows_size)
+        self.clock = pygame.time.Clock()
+        if caption is not None:
+            pygame.display.set_caption("CL's Snake !")
+        if icon is not None:
+            pygame.display.set_icon(icon)
+
+        self.fps = fps
+
+        self.direction = random.choice(direction_choice)
         self.score = 0
         self.time_tick = 0
         self.dir_need_frash = False
-        self.color = (255, 255, 255)
         self.length = 2
 
         self.positon = [[5, 5], [4, 5]]
@@ -35,6 +42,27 @@ class Snake(object):
         self.position_obs = [3, 6]
         self.position_tlg = [0, 0]
         self.border = (int(windows_size[0]/50), int(windows_size[1]/50))
+
+    def draw_rect(self, color, rect, width=0):
+        pygame.draw.rect(
+            Surface=self.screen,
+            color=color,
+            Rect=rect,
+            width=width
+        )
+
+    def draw_circle(self, color, pos, radius, width=0):
+        pygame.draw.circle(
+            Surface=self.screen,
+            color=color,
+            pos=pos,
+            radius=radius,
+            width=width
+        )
+
+    @staticmethod
+    def update_display():
+        pygame.display.update()
 
     def start(self):
         game_font = pygame.font.Font("cl.ttf", 30)
@@ -53,7 +81,7 @@ class Snake(object):
         cl_player = Player(280, 120, 150, 150)
         display_img = pygame.sprite.RenderPlain(cl_player)
         display_img.draw(self.screen)
-        pygame.display.update()
+        self.update_display()
 
         while True:
             for event in pygame.event.get():
@@ -69,19 +97,25 @@ class Snake(object):
         game_over_font = pygame.font.Font("cl.ttf", 30)
         game_over_font_small = pygame.font.Font("cl.ttf", 20)
         game_over_img = game_over_font.render("GAME OVER !", True, (222, 100, 80))
-        pygame.draw.rect(
-            screen,
-            (100, 100, 100),
-            (windows[0] * 0.3, windows[1] * 0.3, windows[0] * 0.4, windows[1] * 0.4), 0
+        self.draw_rect(
+            color=(100, 100, 100),
+            rect=(windows[0] * 0.3, windows[1] * 0.3, windows[0] * 0.4, windows[1] * 0.4),
         )
-        screen.blit(game_over_img, (windows[0] * 0.37, windows[1] * 0.4))
+        screen.blit(
+            source=game_over_img,
+            dest=(windows[0] * 0.37, windows[1] * 0.4)
+        )
         score_img = game_over_font_small.render(
             text="SCORE : %s" % self.score,
             antialias=True,
             color=(222, 100, 80)
         )
-        screen.blit(score_img, (windows[0] * 0.4, windows[1] * 0.4 + 70))
-        pygame.display.update()
+        screen.blit(
+            source=score_img,
+            dest=(windows[0] * 0.4, windows[1] * 0.4 + 70)
+        )
+        self.update_display()
+
         while True:
             self.clock.tick(20)
             for event in pygame.event.get():
@@ -144,38 +178,42 @@ class Snake(object):
             self.dir_need_frash = False
             self.direction = event_key_dir
 
-    def update(self, screen):
-        self.time_tick += 1
+    def update(self):
         self.screen.fill((30, 30, 30))
+
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                sys.exit(0)
+            else:
+                self.parse_event(event=event)
+
         for i in range(self.length):
-            pygame.draw.rect(screen, self.color, (self.positon[i][0]*50+5, self.positon[i][1]*50+5, 40, 40), 0)
-            pygame.draw.circle(screen, (100, 0, 0), (self.positon[0][0]*50+25, self.positon[0][1]*50+25), 10, 0)
-        pygame.draw.rect(screen, (200, 0, 0), (self.position_obs[0]*50, self.position_obs[1]*50, 50, 50), 0)
+            self.draw_rect(
+                color=(255, 255, 255),
+                rect=(self.positon[i][0]*50 + 5, self.positon[i][1]*50 + 5, 40, 40)
+            )
+            self.draw_circle(
+                color=(100, 0, 0),
+                pos=(self.positon[0][0]*50+25, self.positon[0][1]*50+25),
+                radius=10
+            )
+        self.draw_rect(color=(200, 0, 0), rect=(self.position_obs[0]*50, self.position_obs[1]*50, 50, 50))
+
+        self.update_display()
+        self.time_tick += 1
+        self.clock.tick(self.fps)
 
 
 def main():
     windows_size = (700, 500)
 
-    pygame.init()
-    screen = pygame.display.set_mode(windows_size)
-    pygame.display.set_caption("CL's Snake !")
-    game_clock = pygame.time.Clock()
-
-    ratro_snaker = Snake(windows_size=windows_size, screen=screen, clock=game_clock)
-    ratro_snaker.start()
+    caption = "CL's snake !"
+    ratro_snaker = Snake(windows_size=windows_size, caption=caption)
 
     while True:
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                sys.exit(0)
-            else:
-                ratro_snaker.parse_event(event=event)
-
-        ratro_snaker.update(screen)
-        pygame.display.update()
-
-        # time tick
-        game_clock.tick(20)
+        ratro_snaker.start()
+        ratro_snaker.update()
+        ratro_snaker.over()
 
 
 if __name__ == "__main__":
