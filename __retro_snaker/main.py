@@ -2,7 +2,7 @@
 Retro snaker
 ------------
 
-By This is my first GUI program, written in early 2014.
+This is my first GUI program, written in early 2014.
 contact with me: i#caoliang.net.
 """
 
