@@ -44,25 +44,15 @@ class Snake(object):
         self.border = (int(windows_size[0]/50), int(windows_size[1]/50))
 
     def draw_rect(self, color, rect, width=0):
-        pygame.draw.rect(
-            Surface=self.screen,
-            color=color,
-            Rect=rect,
-            width=width
-        )
+        pygame.draw.rect(self.screen, color, rect, width)
 
     def draw_circle(self, color, pos, radius, width=0):
-        pygame.draw.circle(
-            Surface=self.screen,
-            color=color,
-            pos=pos,
-            radius=radius,
-            width=width
-        )
+        pygame.draw.circle(self.screen, color, pos, radius, width)
 
-    @staticmethod
-    def update_display():
+    def update_display(self):
         pygame.display.update()
+        self.time_tick += 1
+        self.clock.tick(self.fps)
 
     def start(self):
         game_font = pygame.font.Font("cl.ttf", 30)
@@ -105,11 +95,7 @@ class Snake(object):
             source=game_over_img,
             dest=(windows[0] * 0.37, windows[1] * 0.4)
         )
-        score_img = game_over_font_small.render(
-            text="SCORE : %s" % self.score,
-            antialias=True,
-            color=(222, 100, 80)
-        )
+        score_img = game_over_font_small.render("SCORE : %s" % self.score, True, (222, 100, 80))
         screen.blit(
             source=score_img,
             dest=(windows[0] * 0.4, windows[1] * 0.4 + 70)
@@ -180,28 +166,26 @@ class Snake(object):
 
     def update(self):
         self.screen.fill((30, 30, 30))
+        while True:
+            for event in pygame.event.get():
+                if event.type == QUIT:
+                    sys.exit(0)
+                else:
+                    self.parse_event(event=event)
 
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                sys.exit(0)
-            else:
-                self.parse_event(event=event)
+            for i in range(self.length):
+                self.draw_rect(
+                    color=(255, 255, 255),
+                    rect=(self.positon[i][0]*50 + 5, self.positon[i][1]*50 + 5, 40, 40)
+                )
+                self.draw_circle(
+                    color=(100, 0, 0),
+                    pos=(self.positon[0][0]*50+25, self.positon[0][1]*50+25),
+                    radius=10
+                )
+            self.draw_rect(color=(200, 0, 0), rect=(self.position_obs[0]*50, self.position_obs[1]*50, 50, 50))
 
-        for i in range(self.length):
-            self.draw_rect(
-                color=(255, 255, 255),
-                rect=(self.positon[i][0]*50 + 5, self.positon[i][1]*50 + 5, 40, 40)
-            )
-            self.draw_circle(
-                color=(100, 0, 0),
-                pos=(self.positon[0][0]*50+25, self.positon[0][1]*50+25),
-                radius=10
-            )
-        self.draw_rect(color=(200, 0, 0), rect=(self.position_obs[0]*50, self.position_obs[1]*50, 50, 50))
-
-        self.update_display()
-        self.time_tick += 1
-        self.clock.tick(self.fps)
+            self.update_display()
 
 
 def main():
