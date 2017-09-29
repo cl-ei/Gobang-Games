@@ -14,45 +14,8 @@ import sys
 import pygame
 from pygame.locals import QUIT
 
-from view import Button
-
-# --------------------------------- Global var -------------------------------------- #
-BLACK = (30, 30, 30)
-WHITE = (255, 255, 255)
-
-# source file clip
-CLIP_HOME_PAGE = (0, 0, 1024, 768)
-CLIP_ABOUT_PAGE = (1024, 0, 1024, 768)
-CLIP_GRID_PAGE = (2048, 0, 800, 600)
-CLIP_THINK = (600, 767, 118, 80)
-CLIP_ONE_MORE_TIME = (718, 767, 374, 203)
-CLIP_VICTORY = (718 + 374, 767, 160, 38)
-CLIP_DEFEAT = (718 + 374 + 160, 767, 446, 77)
-CLIP_BTN_ABOUT = (
-    (0, 767, 120, 60),
-    (0, 767 + 60, 120, 60),
-    (0, 767 + 120, 120, 60),
-)
-CLIP_BTN_BACK = (
-    (120, 767, 120, 60),
-    (120, 767 + 60, 120, 60),
-    (120, 767 + 120, 120, 60),
-)
-CLIP_BTN_GOAHEAD = (
-    (240, 767, 120, 60),
-    (240, 767 + 60, 120, 60),
-    (240, 767 + 120, 120, 60),
-)
-CLIP_BTN_GOBACK = (
-    (360, 767, 120, 60),
-    (360, 767 + 60, 120, 60),
-    (360, 767 + 120, 120, 60),
-)
-CLIP_BTN_START = (
-    (480, 767, 120, 60),
-    (480, 767 + 60, 120, 60),
-    (480, 767 + 120, 120, 60),
-)
+from source import *
+from newcore import GameManager, Role
 
 
 class Game(object):
@@ -87,13 +50,18 @@ class Game(object):
         self.table_txt_mid = pygame.font.Font(default_font, 22)
         self.table_txt_min = pygame.font.Font(default_font, 20)
 
+        self.grid_img = pygame.transform.scale(
+            self.source.subsurface(CLIP_GRID_PAGE),
+            self.window_size
+        )
+        self.think_img = pygame.transform.scale(
+            self.source.subsurface(CLIP_THINK),
+            self.window_size
+        )
+        self.w_img = pygame.image.load("img/round_white.png").convert_alpha()  # (24, 24))
+        self.b_img = pygame.image.load("img/round_black.png").convert_alpha()  # (24, 24))
+
         self.__sources = []
-        # for i in range(10):
-        #     gv.g_num_tab += [max_txt.render(str(i), True, (180, 180, 180))]
-        # for i in range(10, 100):
-        #     gv.g_num_tab += [mid_txt.render(str(i), True, (180, 180, 180))]
-        # for i in range(100, 256):
-        #     gv.g_num_tab += [min_txt.render(str(i), True, (180, 180, 180))]
 
     def create_button(self, style, callback):
         button = Button(style, callback=callback)
@@ -147,70 +115,86 @@ class Game(object):
             self.screen.blit(self.home_img, (0, 0))
             self.update_display()
 
+    def parse_gaming_event(self):
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                sys.exit()
+            else:
+                pass
+        input_data = self.get_table_input()
+        return input_data
+
+    def get_table_input(self):
+        # TODO: add.
+        return self.fps
+
+    def draw_table(self, table):
+        # for i in range(10):
+        #     gv.g_num_tab += [max_txt.render(str(i), True, (180, 180, 180))]
+        # for i in range(10, 100):
+        #     gv.g_num_tab += [mid_txt.render(str(i), True, (180, 180, 180))]
+        # for i in range(100, 256):
+        #     gv.g_num_tab += [min_txt.render(str(i), True, (180, 180, 180))]
+        pass
+
     def gaming(self):
-        grid_img = sc.loadimg("img/grid.png", gv.g_size_win)
-        w_img = sc.loadimg("img/round_white.png", (24, 24))
-        b_img = sc.loadimg("img/round_black.png", (24, 24))
-        think_img = sc.loadimg("img/think.png", (120, 60))
+        self.release_dynamic_created_widget()
 
-        back_btn = sc.Button(gv.g_btn_gameback_imgloc, gv.g_size_btn_gameback, gv.g_pos_btn_gameback)
-        goback_btn = sc.Button(gv.g_btn_goback_imgloc, gv.g_size_btn_gameback, gv.g_pos_btn_goback)
-        goahead_btn = sc.Button(gv.g_btn_goahead_imgloc, gv.g_size_btn_gameback, gv.g_pos_btn_goahead)
+        dynamic_create_btns = [
+            {
+                "style": {
+                    "width": 120,
+                    "heigth": 50,
+                    "left": self.window_size[0] * 0.5 - 140,
+                    "top": self.window_size[1] * 0.75,
+                    "default_img": self.source.subsurface(CLIP_BTN_START[0]),
+                    "hovered_img": self.source.subsurface(CLIP_BTN_START[1]),
+                    "pushed_img": self.source.subsurface(CLIP_BTN_START[2]),
+                },
+                "callback": self.gaming
+            },
+            {
+                "style": {
+                    "width": 120,
+                    "heigth": 50,
+                    "left": self.window_size[0] * 0.5 + 20,
+                    "top": self.window_size[1] * 0.75,
+                    "default_img": self.source.subsurface(CLIP_BTN_ABOUT[0]),
+                    "hovered_img": self.source.subsurface(CLIP_BTN_ABOUT[1]),
+                    "pushed_img": self.source.subsurface(CLIP_BTN_ABOUT[2]),
+                },
+                "callback": self.about
+            },
+            {
+                "style": {
+                    "width": 120,
+                    "heigth": 50,
+                    "left": self.window_size[0] * 0.5 + 20,
+                    "top": self.window_size[1] * 0.75,
+                    "default_img": self.source.subsurface(CLIP_BTN_ABOUT[0]),
+                    "hovered_img": self.source.subsurface(CLIP_BTN_ABOUT[1]),
+                    "pushed_img": self.source.subsurface(CLIP_BTN_ABOUT[2]),
+                },
+                "callback": self.about
+            }
+        ]
+        for btn_args in dynamic_create_btns:
+            self.create_button(**btn_args)
 
-        computer_pgsbar = sc.ProgressBar("img/round_white.png", (12, 12), (675, 50), 40)
-        player_pgsbar = sc.ProgressBar("img/round_black.png", (12, 12), (720, 440), 40)
+        # computer_pgsbar = sc.ProgressBar("img/round_white.png", (12, 12), (675, 50), 40)
+        # player_pgsbar = sc.ProgressBar("img/round_black.png", (12, 12), (720, 440), 40)
 
         gobang_mgr = GameManager()
-        input_info = sc.GetInput()
-
         while True:
-            for event in pygame.event.get():
-                if event.type == QUIT:
-                    exit()
+            events = self.parse_gaming_event()
+            # distribute events
+            # for e in events:
+            #   react = gobang_mgr.do(e)
+            #   self.response_game_mgr_event(e)
 
-            gv.g_screen.blit(grid_img, (0, 0))
-            sc.draw_table(table=gobang_mgr.table, w_img=w_img, b_img=b_img)
-
-            # 不为0时，已分胜负
-            if gobang_mgr.winner is not None:
-                one_more_img = sc.loadimg("img/one_more_time.png", (100, 80))
-                win_img = sc.loadimg(
-                    file_loc="img/win.png" if gobang_mgr.winner == Role.player else "img/win_2.png",
-                    size=(130, 45)
-                )
-                gv.g_screen.blit(win_img, (300, 495))
-                gv.g_screen.blit(one_more_img, (20, 420))
-
-            # 未分胜负
-            else:
-                # 电脑落子
-                if gobang_mgr.busy:
-                    # 显示 思考
-                    gv.g_screen.blit(gv.g_txt_w_thinking, (670, 27))
-                    computer_pgsbar.draw()
-
-                # 玩家落子
-                else:
-                    pressed, pos = input_info.scan()
-                    if pressed:
-                        tab_pos = sc.pixpos_to_table(pos)
-                        print("tab_pos: ", tab_pos)
-                        gobang_mgr.player_take(tab_pos)
-
-                    # 绘制进度条
-                    gv.g_screen.blit(think_img, (680, 420))
-                    player_pgsbar.draw()
-
-            if not gobang_mgr.busy and gobang_mgr.step:
-                goback_btn.update(gobang_mgr.go_back)
-                goahead_btn.update(gobang_mgr.go_ahead)
-
-            event_happend = back_btn.update()
-            if event_happend:
-                break
-
-            pygame.display.update()
-            gv.g_clock.tick(30)
+            self.screen.blit(self.grid_img, (0, 0))
+            self.draw_table(table=gobang_mgr.table)
+            self.update_display()
 
     def about(self):
         self.release_dynamic_created_widget()

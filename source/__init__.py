@@ -1,8 +1,46 @@
 ﻿"""
-This module contains operations of drawring of bottons, progress bars and so on.
+This module contains operations of drawring of bottons, progress bars and source files.
 
 """
 import pygame
+
+# --------------------------------- clip infp -------------------------------------- #
+BLACK = (30, 30, 30)
+WHITE = (255, 255, 255)
+
+# source file clip
+CLIP_HOME_PAGE = (0, 0, 1024, 768)
+CLIP_ABOUT_PAGE = (1024, 0, 1024, 768)
+CLIP_GRID_PAGE = (2048, 0, 800, 600)
+CLIP_THINK = (600, 767, 118, 80)
+CLIP_ONE_MORE_TIME = (718, 767, 374, 203)
+CLIP_VICTORY = (718 + 374, 767, 160, 38)
+CLIP_DEFEAT = (718 + 374 + 160, 767, 446, 77)
+CLIP_BTN_ABOUT = (
+    (0, 767, 120, 60),
+    (0, 767 + 60, 120, 60),
+    (0, 767 + 120, 120, 60),
+)
+CLIP_BTN_BACK = (
+    (120, 767, 120, 60),
+    (120, 767 + 60, 120, 60),
+    (120, 767 + 120, 120, 60),
+)
+CLIP_BTN_GOAHEAD = (
+    (240, 767, 120, 60),
+    (240, 767 + 60, 120, 60),
+    (240, 767 + 120, 120, 60),
+)
+CLIP_BTN_GOBACK = (
+    (360, 767, 120, 60),
+    (360, 767 + 60, 120, 60),
+    (360, 767 + 120, 120, 60),
+)
+CLIP_BTN_START = (
+    (480, 767, 120, 60),
+    (480, 767 + 60, 120, 60),
+    (480, 767 + 120, 120, 60),
+)
 
 
 def loadimg(file_loc, size=None):
