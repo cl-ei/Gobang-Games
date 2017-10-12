@@ -125,16 +125,9 @@ class Game(object):
         return input_data
 
     def get_table_input(self):
-        # TODO: add.
-        return self.fps
+        return 0, 0
 
     def draw_table(self, table):
-        # for i in range(10):
-        #     gv.g_num_tab += [max_txt.render(str(i), True, (180, 180, 180))]
-        # for i in range(10, 100):
-        #     gv.g_num_tab += [mid_txt.render(str(i), True, (180, 180, 180))]
-        # for i in range(100, 256):
-        #     gv.g_num_tab += [min_txt.render(str(i), True, (180, 180, 180))]
         pass
 
     def gaming(self):
