@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 This script is writen for generation an executable file
 for windows operation system by cxFreeze.
