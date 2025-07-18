@@ -10,9 +10,8 @@
 
 """
 
-__author__ = "caoliang"
 
-import time
+from typing import *
 from random import randint
 from threading import Thread
 from time import sleep
@@ -148,11 +147,11 @@ class Core():
         self.who_win     = 0
 
         #行棋的记录
-        self.index   = 0
-        self.step    = [([0] * 2) for i in range(226)]
+        self.index = 0
+        self.step = []
 
-        #上一步行棋在4个方向上的其他棋子数
-        self.last_pcs_dirction   = [0,0,0,0]
+        # 上一步行棋在4个方向上的其他棋子数
+        self.last_pcs_direction = [0, 0, 0, 0]
 
         #评分表
         self.table_type =['aaaaa',
@@ -196,32 +195,29 @@ class Core():
                           250,
                           200]
 
-        #玩家走一步棋
-    def player_take(self,pos = (0,0)):
+    def player_take(self, x: int, y):
+        if self.table[y][x] == 0:
+            self.table[y][x] = 1
 
-        if self.table[pos[0]][pos[1]] == 0:
-            self.table[pos[0]][pos[1]] = 1
-
-            self.index = self.index + 1
-            self.step[self.index] = pos
+            self.index += 1
+            self.step.append((x, y))
 
             self.test_player()
             if self.who_win == 0:
                 self.computer_ctl()
 
-                #电脑走棋控制函数
     def computer_ctl(self):
-        if self.busy == 0 :
+        if self.busy == 0:
             self.busy = 1
-            if self.index<2:
-                task = Thread(target=self.computer_take_first,args=(0,))
+            if self.index < 2:
+                task = Thread(target=self.computer_take_first)
             else:
-                task = Thread(target=self.computer_take,args=(0,))
+                task = Thread(target=self.computer_take)
             task.start()
             return 1
         return 0
 
-    #电脑走第一步
+    # 电脑走第一步
     def computer_take_first(self,tmp):
         sleep(0.6)
         if self.index == 0:
@@ -265,7 +261,7 @@ class Core():
         self.busy = 0
 
     #电脑走第二步以后
-    def computer_take(self,tmp):
+    def computer_take(self):
 
         top_map = Tree()
         self.fill_tree_computer_layer(self.table,top_map,depth = 2)
@@ -410,16 +406,16 @@ class Core():
 
     #检测玩家是否胜利
     def test_player(self):
-        self.last_pcs_dirction = self.cal_sum_arround(self.table,self.step[self.index])
+        self.last_pcs_direction = self.cal_sum_arround(self.table, self.step[-1])
         for i in range(4):
-            if self.last_pcs_dirction[i] >=4:
+            if self.last_pcs_direction[i] >= 4:
                 self.who_win = 1
                 break
 
     def test_computer(self):
-        self.last_pcs_dirction = self.cal_sum_arround(self.table,self.step[self.index],2)
+        self.last_pcs_direction = self.cal_sum_arround(self.table, self.step[self.index], 2)
         for i in range(4):
-            if self.last_pcs_dirction[i] >=4:
+            if self.last_pcs_direction[i] >= 4:
                 self.who_win = 2
                 break
 
