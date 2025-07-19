@@ -2,24 +2,22 @@ import json
 import time
 from typing import *
 from multiprocessing import Process, Queue
+from src.core.core import calc_candidate
 
 
 def calc(q: Queue, table_str: str, first: int):
     table: List[Tuple[int, int]] = [(x, y) for x, y in json.loads(table_str)]
-    print(f"table: {table}, fi: {first}")
-    time.sleep(1)
-    print("done!")
-    for x in range(15):
-        for y in range(15):
-            if (x, y) not in table:
-                print(f"put x: {x}, {y}")
-                q.put((x, y))
-                return
+    print(f"enter calc wrapper.")
+    result = calc_candidate(table, first)
+
+    print(f"calc done: {result}")
+    q.put(result)
+    return
 
 
 class FlowController:
-    ROLE_PLAYER = 0
-    ROLE_PC = 1
+    ROLE_PLAYER = 1
+    ROLE_PC = 2
 
     STATUS_PLAYER = 0
     STATUS_PC = 1
